@@ -7,6 +7,7 @@ import torch.nn as nn
 import os
 from copy import deepcopy
 from torchvision import models
+from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
 import warnings
 warnings.filterwarnings("ignore") 
@@ -17,7 +18,7 @@ def train(model, train_dataloader, optimizer, loss_function, device, writer, epo
         correct_predictions = 0
         total_predictions = 0
         model.train()
-        for i , (x, y) in enumerate(train_dataloader):
+        for i , (x, y) in enumerate(tqdm(train_dataloader)):
             x = x.to(device)
             y = y.to(device)
             
@@ -44,7 +45,7 @@ def val(model, val_dataloader, loss_function, device, writer, epoch):
         val_running_loss = 0.0
         val_correct_predictions = 0
         val_total_predictions = 0
-        for j , (val_x, val_y) in enumerate(val_dataloader):
+        for j , (val_x, val_y) in enumerate(tqdm(val_dataloader)):
             x = x.to(device)
             y = y.to(device)
             
@@ -67,7 +68,7 @@ def main():
     transform = transforms.Compose([transforms.ToTensor(),
                                     transforms.Resize((224,224))])
     # Load the pre-trained ResNet50 model
-    model = models.resnet50(pretrained=True)
+    model = Model().to(device=device)
     loss_function = nn.CrossEntropyLoss().to(device=device)
 
     BATCH_SIZE = 16
@@ -76,11 +77,7 @@ def main():
     LEARNING_RATE = 0.001
     EPOCHS = 10
     SAVE_PATH = './saved_models/resnet50_attempt_01'
-    NUM_CLASSES = 90
-
-    for param in model.parameters():
-         param.requires_grad = False
-    model.fc = nn.Linear(model.fc.in_features, NUM_CLASSES).to(device=device)
+    #NUM_CLASSES = 90
 
     # Set up the optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
