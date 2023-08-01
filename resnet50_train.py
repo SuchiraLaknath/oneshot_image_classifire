@@ -46,8 +46,8 @@ def val(model, val_dataloader, loss_function, device, writer, epoch):
         val_correct_predictions = 0
         val_total_predictions = 0
         for j , (val_x, val_y) in enumerate(tqdm(val_dataloader)):
-            x = x.to(device)
-            y = y.to(device)
+            val_x = val_x.to(device)
+            val_y = val_y.to(device)
             
             with torch.inference_mode():
                 val_outputs = model(val_x)
@@ -89,6 +89,7 @@ def main():
     val_dataloader = DataLoader(dataset= val_set, batch_size= BATCH_SIZE, shuffle= False, num_workers= 1)
 
     for epoch in range(EPOCHS):
+        print(f"EPOCH : {epoch+1}")
         model = train(model = model, train_dataloader= train_dataloader, optimizer = optimizer, loss_function = loss_function, device= device, writer= writer, epoch=epoch)
         val(model= model, val_dataloader= val_dataloader, loss_function = loss_function, device= device, writer= writer, epoch=epoch)
         torch.save(model.state_dict(), os.path.join(SAVE_PATH, str(f'resnet50_model_epoch_{epoch+1}')))
